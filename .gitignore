@@ -34,4 +34,4 @@ build/
 
 .idea/
 
-src/main/resources/serviceAccountKey.json
+serviceAccountKey.json
