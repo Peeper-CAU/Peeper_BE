@@ -14,11 +14,11 @@ public class VoiceService {
     private static final String AI_SERVER_HOST = "ai.server.host";
     private static final int AI_SERVER_PORT = 12345;
 
-    public void processAudioFile(byte[] wavData) {
+    public void processAudioFile(String uid, byte[] wavData) {
         boolean result = sendWavDataToAIServer(wavData);
 
         if (result) {
-            sendNotificationToFirebase();
+            sendNotificationToFirebase(uid);
         }
     }
 
@@ -39,11 +39,11 @@ public class VoiceService {
         }
     }
 
-    private void sendNotificationToFirebase() {
+    private void sendNotificationToFirebase(String uid) {
         Message message = Message.builder()
-                .putData("title", "Phishing Analysis Result")
+//                .putData("title", "Phishing Analysis Result")
                 .putData("body", "It is suspected to be phishing")
-//                .setTopic()
+                .setTopic(uid)
                 .build();
 
         try {
