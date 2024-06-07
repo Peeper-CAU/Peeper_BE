@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>com.cau</groupId>
-    <artifactId>Peeper</artifactId>
+    <artifactId>peeper</artifactId>
 
     <version>0.0.1-SNAPSHOT</version>
 
