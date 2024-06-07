@@ -3,7 +3,7 @@ FROM openjdk:11-slim as builder
 WORKDIR /build
 
 COPY ./ ./
-RUN ./mvnw compile
+RUN ./mvnw package
 
 FROM openjdk:11-slim
 
