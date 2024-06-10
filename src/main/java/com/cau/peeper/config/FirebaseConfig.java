@@ -15,12 +15,9 @@ import java.util.Objects;
 @Configuration
 public class FirebaseConfig {
 
-    @Value("${firebase.keyPath}")
-    private String keyPath;
-
     @PostConstruct
     public void initialize() throws IOException {
-        InputStream serviceAccount = getClass().getResourceAsStream(keyPath);
+        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("serviceAccountKey.json");
 
         if (Objects.isNull(serviceAccount)) {
             throw new NullPointerException("service account is null");
