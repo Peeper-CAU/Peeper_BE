@@ -2,8 +2,6 @@ package com.cau.peeper.handler;
 
 import com.cau.peeper.service.VoiceService;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
@@ -18,10 +16,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class WebSocketHandler extends AbstractWebSocketHandler {
 
-    private VoiceService voiceService;
+    private final VoiceService voiceService;
 
     private final ConcurrentHashMap<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private static final String UID_ATTRIBUTE = "uid";
+
+    public WebSocketHandler(VoiceService voiceService) {
+        this.voiceService = voiceService;
+    }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
