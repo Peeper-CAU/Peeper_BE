@@ -2,7 +2,6 @@ package com.cau.peeper.handler;
 
 import com.cau.peeper.service.VoiceService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
@@ -22,7 +21,6 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
     private final ConcurrentHashMap<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private static final String UID_ATTRIBUTE = "uid";
 
-    @Autowired
     public WebSocketHandler(VoiceService voiceService) {
         this.voiceService = voiceService;
     }
