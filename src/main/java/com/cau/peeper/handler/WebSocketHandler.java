@@ -1,6 +1,7 @@
 package com.cau.peeper.handler;
 
 import com.cau.peeper.service.VoiceService;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -13,10 +14,9 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Component
 public class WebSocketHandler extends AbstractWebSocketHandler {
-
-    private final Logger logger = LoggerFactory.getLogger(WebSocketHandler.class);
 
     private VoiceService voiceService;
 
@@ -28,7 +28,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
         String uid = message.getPayload();
         sessions.put(uid, session);
         session.getAttributes().put(UID_ATTRIBUTE, uid);
-        logger.info("Text message received: UID [{}]", uid);
+        log.info("Text message received: UID [{}]", uid);
     }
 
     @Override
@@ -37,14 +37,14 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
         String uid = (String) session.getAttributes().get(UID_ATTRIBUTE);
 
         if (uid != null) {
-            logger.info("Binary message received: UID [{}]", uid);
+            log.info("Binary message received: UID [{}]", uid);
             voiceService.processAudioFile(uid, payload);
         }
     }
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws IOException {
-        logger.error("Transport error: error [{}]", exception.getMessage());
+        log.error("Transport error: error [{}]", exception.getMessage());
         session.close(CloseStatus.SERVER_ERROR);
     }
 
@@ -53,7 +53,7 @@ public class WebSocketHandler extends AbstractWebSocketHandler {
         String uid = (String) session.getAttributes().get(UID_ATTRIBUTE);
         if (uid != null) {
             sessions.remove(uid);
-            logger.info("Connection closed: status [{}]", status);
+            log.info("Connection closed: status [{}]", status);
         }
     }
 }
