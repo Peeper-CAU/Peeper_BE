@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Base64;
 
 @Slf4j
 @Service
@@ -25,7 +26,7 @@ public class VoiceService {
 
     public void processAudioFile(String uid, byte[] wavData) {
         log.info("Starting processAudioFile for uid: {}", uid);
-        AnalysisRequest analysisRequest = new AnalysisRequest(uid, wavData);
+        AnalysisRequest analysisRequest = new AnalysisRequest(uid, Base64.getEncoder().encodeToString(wavData));
         AnalysisResponse analysisResponse = sendWavDataToAIServer(analysisRequest);
 
         Boolean messageSending = analysisResponse.getMessageSending();
@@ -50,16 +51,17 @@ public class VoiceService {
             connection.setRequestProperty("Content-Type", "application/json");
 
             String jsonRequest = objectMapper.writeValueAsString(analysisRequest);
-            log.debug("JSON Request: {}", jsonRequest);
+            log.info("JSON Request: {}", jsonRequest);
 
             try (OutputStream outputStream = connection.getOutputStream()) {
                 outputStream.write(jsonRequest.getBytes());
                 outputStream.flush();
+                log.info("Data sent to AI server for uid: {}", analysisRequest.getUid());
             }
 
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                 String response = reader.readLine();
-                log.debug("Response from AI server: {}", response);
+                log.info("Response from AI server: {}", response);
                 return objectMapper.readValue(response, AnalysisResponse.class);
             }
         } catch (IOException e) {
