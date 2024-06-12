@@ -52,16 +52,15 @@ public class ServerSocketHandler {
                 String uid = in.readLine();
                 log.info("Received UID: " + uid);
 
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 byte[] buffer = new byte[4096];
                 int read;
                 while ((read = dis.read(buffer)) != -1) {
-                    baos.write(buffer, 0, read);
-                }
-                byte[] wavData = baos.toByteArray();
-                log.info("WAV 데이터 수신 완료: {} bytes", wavData.length);
+                    byte[] wavData = new byte[read];
+                    System.arraycopy(buffer, 0, wavData, 0, read);
+                    log.info("WAV 데이터 수신 완료: {} bytes", read);
 
-                voiceService.processAudioFile(uid, wavData);
+                    voiceService.processAudioFile(uid, wavData);
+                }
 
             } catch (IOException e) {
                 log.error("Client handling error", e);
