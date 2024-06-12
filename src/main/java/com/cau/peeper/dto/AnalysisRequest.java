@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class AnalysisRequest {
 
     private String uid;
-    private byte[] wavData;
+    private String wavData;
 }
