@@ -47,16 +47,23 @@ public class ServerSocketHandler {
     private void handleClient(Socket socket) {
         new Thread(() -> {
             try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                 DataInputStream dis = new DataInputStream(socket.getInputStream());
-                 ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                 DataInputStream dis = new DataInputStream(socket.getInputStream())) {
 
-                String uid = in.readLine();
+                char[] readBuffer = new char[1024];
+                int readLength = in.read(readBuffer);
+                if (readLength == -1) {
+                    return;
+                }
+
+                String uid = new String(readBuffer, 0, readLength);
                 log.info("Received UID: " + uid);
 
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 byte[] buffer = new byte[4096];
                 int read;
                 while ((read = dis.read(buffer)) != -1) {
                     String dataString = new String(buffer, 0, read);
+                    log.info("dataString : {}", dataString);
                     if (dataString.contains("EOF")) {
                         int eofIndex = dataString.indexOf("EOF");
                         baos.write(buffer, 0, eofIndex);
