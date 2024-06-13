@@ -55,10 +55,20 @@ public class ServerSocketHandler {
                     return;
                 }
 
-                String uid = new String(readBuffer, 0, readLength);
-                log.info("Received UID: " + uid);
-
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                String uidString = new String(readBuffer, 0, readLength);
+                String uid = null;
+                if (uidString.contains("EOF")) {
+                    int eofIndex = uidString.indexOf("EOF");
+                    uid = uidString.substring(0, eofIndex);
+                    log.info("Received UID: " + uid);
+
+                    if (eofIndex + 3 < readLength) {
+                        baos.write(uidString.substring(eofIndex + 3).getBytes());
+                    }
+                }
+                
                 byte[] buffer = new byte[4096];
                 int read;
                 while ((read = dis.read(buffer)) != -1) {
@@ -71,6 +81,8 @@ public class ServerSocketHandler {
                         log.info("WAV 데이터 수신 완료: {} bytes", wavData.length);
                         voiceService.processAudioFile(uid, wavData);
                         baos.reset();
+                    } else {
+                        baos.write(buffer, 0, read);
                     }
                 }
             } catch (IOException e) {
