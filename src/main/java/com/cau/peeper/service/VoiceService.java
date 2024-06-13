@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -77,8 +78,9 @@ public class VoiceService {
 
     private void sendNotificationToFirebase(String uid, String riskLevel) {
         Message message = Message.builder()
-                .putData("title", "Phishing Analysis Result")
-                .putData("body", riskLevel)
+                .setNotification(Notification.builder()
+                        .setBody(riskLevel)
+                        .build())
                 .setTopic(uid)
                 .build();
 
