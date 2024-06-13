@@ -14,6 +14,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -77,15 +78,23 @@ public class VoiceService {
     }
 
     private void sendNotificationToFirebase(String uid, String riskLevel) {
+        String body = null;
+        if (Objects.equals(riskLevel, "1단계 의심") || Objects.equals(riskLevel, "2단계 주의")) {
+            body = riskLevel + "\n통화 내용에 유의해주세요.";
+        } else {
+            body = riskLevel + "\n개인정보 및 금전 탈취에 주의하고 통화를 끊어주세요.";
+        }
         Message message = Message.builder()
                 .setNotification(Notification.builder()
-                        .setBody(riskLevel)
+                        .setTitle("보이스피싱이 탐지되었습니다!")
+                        .setBody(body)
                         .build())
                 .setTopic(uid)
                 .build();
 
         try {
-            FirebaseMessaging.getInstance().send(message);
+            String response = FirebaseMessaging.getInstance().send(message);
+            log.info("FirebaseMessaging : {}", response);
             log.info("Notification sent successfully for uid: {}", uid);
         } catch (FirebaseMessagingException e) {
             log.error("Error occurred while sending notification to Firebase for uid: {}", uid, e);
