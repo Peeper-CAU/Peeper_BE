@@ -47,7 +47,8 @@ public class ServerSocketHandler {
     private void handleClient(Socket socket) {
         new Thread(() -> {
             try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                 DataInputStream dis = new DataInputStream(socket.getInputStream())) {
+                 DataInputStream dis = new DataInputStream(socket.getInputStream());
+                 ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
                 String uid = in.readLine();
                 log.info("Received UID: " + uid);
@@ -55,13 +56,16 @@ public class ServerSocketHandler {
                 byte[] buffer = new byte[4096];
                 int read;
                 while ((read = dis.read(buffer)) != -1) {
-                    byte[] wavData = new byte[read];
-                    System.arraycopy(buffer, 0, wavData, 0, read);
-                    log.info("WAV 데이터 수신 완료: {} bytes", read);
-
-                    voiceService.processAudioFile(uid, wavData);
+                    String dataString = new String(buffer, 0, read);
+                    if (dataString.contains("EOF")) {
+                        int eofIndex = dataString.indexOf("EOF");
+                        baos.write(buffer, 0, eofIndex);
+                        byte[] wavData = baos.toByteArray();
+                        log.info("WAV 데이터 수신 완료: {} bytes", wavData.length);
+                        voiceService.processAudioFile(uid, wavData);
+                        baos.reset();
+                    }
                 }
-
             } catch (IOException e) {
                 log.error("Client handling error", e);
             } finally {
